@@ -10,7 +10,7 @@ from src.components.json_component.components.utils import is_valid_json, format
 class TextViewFrame(UIComponent):
     def __init__(self, parent: object = None):
         super().__init__(parent)
-        self._data_changed_calbback = None
+        self._data_changed_callback = None
         self._error_text_lb = None
         self._error_text = None
         self._editor = None
@@ -45,7 +45,7 @@ class TextViewFrame(UIComponent):
         return self
     
     def set_data_changed_callback(self, callback_function) -> NoReturn:
-        self._data_changed_calbback = callback_function
+        self._data_changed_callback = callback_function
     
     def _on_editor_modified(self, _):
         print("_on_editor_modified")
