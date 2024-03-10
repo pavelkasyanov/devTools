@@ -10,50 +10,13 @@ from src.components.json_component.components.utils import is_valid_json, format
 class TextViewFrame(UIComponent):
     def __init__(self, parent: object = None):
         super().__init__(parent)
+        self._data_changed_calbback = None
         self._error_text_lb = None
         self._error_text = None
         self._editor = None
         self.name = "Text View"
         self._is_data_valid = False
-
-    def _on_editor_modified(self, _):
-        print("_on_editor_modified")
-        modified_text = self._editor_get_text()
-        self._validate_text(modified_text)
-
-    def _validate_text(self, data: str) -> NoReturn:
-        self._is_data_valid = is_valid_json(data)
-        if not self._is_data_valid:
-            self._error_text.set("invalid json")
-            self._error_text_lb.config(foreground="red")
-        else:
-            self._error_text.set("valid json")
-            self._error_text_lb.config(foreground="green")
-
-        self._root.update_idletasks()
-
-    def _on_fmt_data(self) -> NoReturn:
-        current_text = self._editor_get_text()
-        new_text = format_json(current_text)
-        self._editor_set_text(new_text)
-
-    def _on_min_data(self) -> NoReturn:
-        current_text = self._editor_get_text()
-        new_text = minimize_json(current_text)
-        self._editor_set_text(new_text)
-
-    def _editor_get_text(self) -> str:
-        return self._editor.get("1.0", END)
-
-    def _editor_del_all_text(self) -> NoReturn:
-        self._editor.delete("1.0", END)
-
-    def _editor_replace_text(self, new_data: str, start: str = "1.0"):
-        self._editor.insert(start, new_data)
-
-    def _editor_set_text(self, new_data: str) -> NoReturn:
-        self._editor_del_all_text()
-        self._editor_replace_text(new_data)
+        self._json_data_text = None
 
     def init(self) -> UIComponent:
         self._root = ttk.Frame(self._parent)
@@ -80,3 +43,49 @@ class TextViewFrame(UIComponent):
         self._editor.insert(END, inserted_text)
 
         return self
+    
+    def set_data_changed_callback(self, callback_function) -> NoReturn:
+        self._data_changed_calbback = callback_function
+    
+    def _on_editor_modified(self, _):
+        print("_on_editor_modified")
+        modified_text = self._editor_get_text()
+        self._validate_text(modified_text)
+
+    def _validate_text(self, data: str) -> NoReturn:
+        self._is_data_valid = is_valid_json(data)
+        if not self._is_data_valid:
+            self._error_text.set("invalid json")
+            self._error_text_lb.config(foreground="red")
+        else:
+            self._error_text.set("valid json")
+            self._error_text_lb.config(foreground="green")
+            self._json_data_text = self._editor_get_text()
+
+        self._root.update_idletasks()
+
+    def _on_data_changed(self) -> NoReturn:
+        pass
+
+    def _on_fmt_data(self) -> NoReturn:
+        current_text = self._editor_get_text()
+        new_text = format_json(current_text)
+        self._editor_set_text(new_text)
+
+    def _on_min_data(self) -> NoReturn:
+        current_text = self._editor_get_text()
+        new_text = minimize_json(current_text)
+        self._editor_set_text(new_text)
+
+    def _editor_get_text(self) -> str:
+        return self._editor.get("1.0", END)
+
+    def _editor_del_all_text(self) -> NoReturn:
+        self._editor.delete("1.0", END)
+
+    def _editor_replace_text(self, new_data: str, start: str = "1.0"):
+        self._editor.insert(start, new_data)
+
+    def _editor_set_text(self, new_data: str) -> NoReturn:
+        self._editor_del_all_text()
+        self._editor_replace_text(new_data)
